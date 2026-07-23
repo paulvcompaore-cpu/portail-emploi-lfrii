@@ -39,19 +39,10 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          if [ -f extracted_jobs.json ]; then
-            python3 -c "
-          import json, subprocess
-          with open('extracted_jobs.json', 'r', encoding='utf-8') as f:
-              jobs = json.load(f)
-          for job in jobs:
-              title = job.get('title', '').replace(\"'\", \"''\")
-              company = job.get('company', '').replace(\"'\", \"''\")
-              desc = job.get('description', '').replace(\"'\", \"''\")
-              sql = f\"INSERT INTO jobs (id, title, company, pays, region, ville, contract_types, description, date_posted, date_expiry, source_url, status) VALUES ('{job['id']}', '{title}', '{company}', '{job['pays']}', '{job['region']}', '{job['ville']}', '{job['contract_types']}', '{desc}', '{job['date_posted']}', '{job['date_expiry']}', '{job['source_url']}', '{job['status']}') ON CONFLICT(id) DO UPDATE SET title=excluded.title, status=excluded.status;\"
-              subprocess.run(['wrangler', 'd1', 'execute', 'lfrii_jobs_db', '--remote', '--command', sql], cwd='cloudflare', check=True)
-          print(f'✅ {len(jobs)} offres synchronisées !')
-          "
+          if [ -f schema.sql ]; then
+            cd cloudflare && npx wrangler d1 execute lfrii_jobs_db --remote --file=../schema.sql
+          elif [ -f extracted_jobs.json ]; then
+            echo "Fichier json détecté"
           else
-            echo "⚠️ Aucun fichier extracted_jobs.json généré."
+            echo "Aucun fichier à synchroniser"
           fi
