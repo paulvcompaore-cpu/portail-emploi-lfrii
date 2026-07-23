@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail Veille Carrière & Matching Emploi - @lfriiactu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#f0f9ff', 500: '#0284c7', 600: '#0369a1', 900: '#0c4a6e' }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200" id="body-app">
+
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-brand-600 p-2 rounded-lg text-white font-bold">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">
+                        Veille Carrière LFRII
+                    </h1>
+                    <p class="text-xs text-slate-400">Canal Officiel @lfriiactu • Propulsé par AI Local</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button id="theme-toggle" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
+                    <i class="fa-solid fa-moon" id="theme-icon"></i>
+                </button>
+                <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 100% Gratuit
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <section class="lg:col-span-4 space-y-6">
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 shadow-xl">
+                <h2 class="text-md font-semibold mb-3 flex items-center gap-2 text-sky-400">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    1. Déposer votre CV (PDF / DOCX)
+                </h2>
+                <p class="text-xs text-slate-400 mb-4">
+                    L'analyse est réalisée instantanément <b>sur votre ordinateur</b>. Vos données restent confidentielles et ne quittent pas votre navigateur.
+                </p>
+
+                <div id="drop-zone" class="border-2 border-dashed border-slate-600 hover:border-brand-500 rounded-xl p-6 text-center cursor-pointer transition bg-slate-900/40">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 mb-2"></i>
+                    <p class="text-sm font-medium">Glissez-déposez votre CV ici</p>
+                    <p class="text-xs text-slate-500 mt-1">Formats acceptés : .pdf, .docx</p>
+                    <input type="file" id="cv-file-input" class="hidden" accept=".pdf,.docx">
+                </div>
+
+                <div id="cv-status" class="hidden mt-4 p-3 rounded-lg bg-slate-900 border border-slate-700">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-emerald-400 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-check"></i> CV extrait avec succès
+                        </span>
+                        <span id="cv-word-count" class="text-xs text-slate-400">0 mots</span>
+                    </div>
+                    <p id="cv-filename" class="text-xs font-mono text-slate-300 mt-1 truncate"></p>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 shadow-xl space-y-4">
+                <h3 class="text-sm font-semibold text-slate-300">Filtres de recherche</h3>
+                
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Type de contrat</label>
+                    <select id="filter-contract" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200">
+                        <option value="ALL">Tous les contrats</option>
+                        <option value="CDI">CDI</option>
+                        <option value="CDD">CDD</option>
+                        <option value="Consultance">Consultance</option>
+                        <option value="Freelance">Freelance</option>
+                        <option value="Remote">Remote / Télétravail</option>
+                        <option value="Flexible">Flexible</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Pays / Localisation</label>
+                    <select id="filter-country" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200">
+                        <option value="ALL">Toutes les localisations</option>
+                        <option value="Togo">Togo</option>
+                        <option value="Bénin">Bénin</option>
+                        <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                        <option value="Sénégal">Sénégal</option>
+                        <option value="France">France</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Statut des offres</label>
+                    <select id="filter-status" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200">
+                        <option value="active">Offres Actives uniquement</option>
+                        <option value="archived">Archives (Expirées / Historique)</option>
+                        <option value="ALL">Toutes les offres</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="lg:col-span-8 space-y-4">
+            <div class="flex items-center justify-between bg-slate-800/40 p-3 rounded-xl border border-slate-800">
+                <span class="text-sm text-slate-300" id="jobs-count">Chargement des offres...</span>
+                <span class="text-xs text-slate-500">Mise à jour en direct depuis Telegram</span>
+            </div>
+
+            <div id="jobs-container" class="space-y-4"></div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500 mt-auto">
+        Portail de Veille Carrière &nbsp;•&nbsp; Source Telegram @lfriiactu &nbsp;•&nbsp; 100% Open-Source & Gratuit
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+name = "portail-emploi-lfrii-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lfrii_jobs_db"
+database_id = "f8fab9b2-fa26-4d85-8695-5b8ace12baf9"
