@@ -1,0 +1,7 @@
+name = "portail-emploi-lfrii"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lfrii_jobs_db"
+database_id = "f8fab9b2-fa26-4d85-8695-5b8ace12baf9"
